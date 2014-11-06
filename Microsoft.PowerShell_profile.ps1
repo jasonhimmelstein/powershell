@@ -2,11 +2,6 @@
 #v3.0 10/6/2014
 #Jason Himmelstein
 #http://www.sharepointlonghorn.com
-  
-Write-Host "  Script to create PowerShell Profiles to be used 
-  v1.8 01/26/2013
-  Jason Himmelstein
-  http://www.sharepointlonghorn.com" -ForegroundColor Yellow -BackgroundColor black
 
 function get-cloudy
 {
