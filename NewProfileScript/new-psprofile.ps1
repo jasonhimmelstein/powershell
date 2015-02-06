@@ -1,5 +1,5 @@
 ﻿#  Script to create the PowerShell Profiles for every user 
-#  v2.4 02/5/2015
+$version = "v3.4 02/5/2015"
 #  Jason Himmelstein
 #  http://www.sharepointlonghorn.com
 
@@ -11,9 +11,12 @@ $profilescript = "create-powershellprofiles.bat"
 $createprofile = "create-profiles.ps1"
 $checkprofileshortcut = "check-profiles.bat"
 
-# In order to be able to make programmatic changes to the registry you need to set the remote execution policy  to allow this unless you unblock this script 
-#Write-Host "Setting the Remote Execution policy to allow Registry changes" -foregroundcolor magenta -backgroundcolor black 
-#Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+#Display the profile version
+Write-host "New PowerShell Profile Creation Script $version"
+
+# In order to be able to make programmatic changes to the registry you need to set the remote execution policy to allow this unless you unblock this script 
+Write-Host "Setting the Remote Execution policy to allow Registry changes" -foregroundcolor magenta -backgroundcolor black 
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 
 # This will create a logs and scripts directory off of the C:\ Root
 Write-Host "Creating the logs and scripts directories..." -foregroundcolor white -backgroundcolor black
@@ -83,7 +86,7 @@ New-Item -type file -path $psprofile -force
 # In an Office Web Apps remove the SharePoint PSSnapin and reference in the Write-Host
 Add-Content $psprofile {  
 #PowerShell Profiles to be used
-#v3.9 11/18/2014
+$version = "v4.2 02/05/2015"
 #Jason Himmelstein
 #http://www.sharepointlonghorn.com
   
@@ -111,10 +114,14 @@ Get-AzureVM | fl name,status
 }
 }
 
+#Display the profile version
+Write-host "PowerShell Profile $version"
+
 # Setting the default starting path
 Set-Location c:\powershellscripts\
 #PowerShell Profile for PSSnapin
 # Welcome message
+$Name = $env:Username
 $dName = $env:USERDOMAIN + '\' + $env:Username
 
 if ( -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
@@ -155,23 +162,67 @@ get-cloudy
 
 # In an Office Web Apps remove the SharePoint PSSnapin and reference in the Write-Host
 Add-Content $psiseprofile {
-Write-Host "  Script to create PowerShell ISE Profiles to be used in a SharePoint environment
-  v1.8 01/26/2013
-  Jason Himmelstein
-  http://www.sharepointlonghorn.com
-  " -ForegroundColor Yellow -BackgroundColor black
+# PowerShell_ISE profile for SharePoint environments
+$version = "v4.2 02/05/2015"
+# Jason Himmelstein
+# http://www.sharepointlonghorn.com
+
+function get-cloudy
+{
+$AZLoad = Read-Host "Do you wish to load your Azure Accounts? Type [y] to load" 
+if ($AZLoad -eq "y"){$AZLoaded = add-AzureAccount}
+
+If($AZLoad -eq "y")
+{
+Write-Host "The following are Azure Subscriptions that you are connected to:" -ForegroundColor Blue -BackgroundColor Gray
+Get-AzureSubscription | ft SubscriptionName | out-default
+}
+}
+
+function Load-AzureSubscription
+{
+Select-AzureSubscription -SubscriptionName $Asub
+}
+
+function Load-CloudService
+{
+$tACS = "CloudService"
+
+# Connect to the desired Azure Subscription
+# Select-AzureSubscription -SubscriptionName $ASub
+""
+""
+# Get the Cloud Service Name
+Write-Host "The following are a part of the Azure Cloud Service you are connected to:" -ForegroundColor Blue -BackgroundColor Gray
+Get-AzureService | fl ServiceName,affinitygroup,status
+$ACS = Read-Host -Prompt "Which Azure Cloud Service is hosting your VMs. If ""$tACS"" please press enter otherwise type the name of the Azure Cloud Service"  
+if ($ACS -eq "") {$ACS = $tACS}
+}
+
+function List-AzureVms
+{
+Write-host "The following VMs are now available to you as a part of the Cloud Service ""$ACS"":"
+Get-AzureVM | fl name,status
+}
+
+#Display the profile version
+Write-host "PowerShell Profile $version"
+
 # Setting the default starting path
 Set-Location c:\powershellscripts\
 #PowerShell Profile for PSSnapin
 # Welcome message
 $Name = $env:Username
+$dName = $env:USERDOMAIN + '\' + $env:Username
+""
 if ( -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
 { 
-    Write-Output "This PowerShell ISE prompt is not elevated" -ForegroundColor Yellow -BackgroundColor black
+    Write-Output "This PowerShell ISE prompt is not elevated"
     write-output "If you are trying to effect change to a SharePoint environment you need to be running PowerShell ISE as Administrator. 
-Please restart PowerShell ISE as with the administrator token set." -ForegroundColor Yellow -BackgroundColor black
+Please restart PowerShell ISE as with the administrator token set." 
     return
 }
+
 Function Get-logNameFromDate
  {
  Param(
@@ -209,26 +260,27 @@ Transcript started. Output file is $logname
   $transcriptHeader >> $logname
   $psISE.CurrentPowerShellTab.Output.Text >> $logname
 } #end function start-iseTranscript
+
 Write-Host "Please wait while the PowerShell snap-ins load" -foregroundcolor black -backgroundcolor gray
 Add-PSSnapin Microsoft.SharePoint.PowerShell -ea 0
 Add-PSSnapin Microsoft.Windows.AD -ea 0
 Import-Module ActiveDirectory -ErrorAction SilentlyContinue
-Write-Host "
-The following PowerShell Snap-ins are loaded:" -foregroundcolor darkgreen -backgroundcolor gray
+Write-Host "The following PowerShell Snap-ins are loaded:" -foregroundcolor darkgreen -backgroundcolor gray
 get-pssnapin
+Import-Module 'C:\Program Files (x86)\Microsoft SDKs\Azure\PowerShell\ServiceManagement\Azure\Azure.psd1'-ErrorAction SilentlyContinue
+Import-Module 'C:\Program Files\SharePoint Online Management Shell\Microsoft.Online.SharePoint.PowerShell\Microsoft.Online.SharePoint.PowerShell.psd1' -ErrorAction SilentlyContinue
+""
 Write-Host "The following PowerShell Modules are loaded:" -foregroundcolor DarkGreen -BackgroundColor Gray
 get-module | ft Name | out-default
 Write-Host "In PowerShell v2 when you are finished and want to log your transcript 
 please use the Output-ISETranscript command before closing or wiping the window.
 This command does not yet work for PowerShell v3" -foregroundcolor white -BackgroundColor DarkMagenta
 Write-Host "
-You are now entering PowerShell_ISE in the context of: $Name" -foregroundcolor darkgreen -backgroundcolor gray
-}
-}
+You are now entering PowerShell in the context of: $dName" -foregroundcolor darkgreen -backgroundcolor gray
 
-# Add the create-profile.ps1 script to the runonce registry key to ensure that new users get the custom profile
-# Write-Host "Adding Check for PowerShell Profiles to Registry..." -foregroundcolor white -backgroundcolor black
-# set-itemproperty -path registry::HKLM\Software\Microsoft\Windows\CurrentVersion\Run -Name PowerShellProfile -Value "powershell.exe -WindowStyle Hidden -file $scriptspath\$checkforprofiles"
+get-cloudy
+}
+}
 
 # Add content to create-powershellprofiles.bat
 Write-Host "Adding content to the create PowerShell Profiles batch file..." -foregroundcolor white -backgroundcolor black
