@@ -89,7 +89,7 @@ Add-Content $psprofile {
 $version = "v4.2 02/05/2015"
 #Jason Himmelstein
 #http://www.sharepointlonghorn.com
-  
+ 
 function get-cloudy
 {
 If($AZLoad -eq "y")
@@ -126,8 +126,8 @@ $dName = $env:USERDOMAIN + '\' + $env:Username
 
 if ( -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
 { 
-    Write-Output "This PowerShell prompt is not elevated" -ForegroundColor Yellow -BackgroundColor black
-    write-output "If you are trying to effect change to a SharePoint environment you need to be running PowerShell as Administrator. 
+    Write-Host "This PowerShell prompt is not elevated" -ForegroundColor Red -BackgroundColor black
+    Write-Host "If you are trying to effect change to a SharePoint environment you need to be running PowerShell as Administrator. 
 Please restart PowerShell as with the administrator token set." -ForegroundColor Yellow -BackgroundColor black
     return
 }
