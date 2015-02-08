@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Servers>
+  <VMs>
+    <LAB-DC1>
+      <MemoryStartupBytes>2048</MemoryStartupBytes>
+      <vhdpath>"D:\VMs\LAB-DC1\Virtual Hard Disks\LAB-DC1.vhdx"</vhdpath>
+      <generation>2</generation>
+      <bootdevice>VHD</bootdevice>
+      <switchname>"LAB_Switch"</switchname>
+      <path>"D:\VMs\"</path>
+      <processors>1</processors>
+      <ServerName>LAB-DC1</ServerName>
+      <dynamicmemory>$true</dynamicmemory>
+    </LAB-DC1>
+    <LAB-App1>
+      <MemoryStartupBytes>8192</MemoryStartupBytes>
+      <vhdpath>"K:\LAB-App1\Virtual Hard Disks\LAB-App1.vhdx"</vhdpath>
+      <generation>2</generation>
+      <bootdevice>VHD</bootdevice>
+      <switchname>"LAB_Switch"</switchname>
+      <path>"K:\"</path>
+      <processors>2</processors>
+      <ServerName>LAB-App1</ServerName>
+      <dynamicmemory>$false</dynamicmemory>
+    </LAB-App1>
+    <LAB-Web1>
+      <MemoryStartupBytes>8192</MemoryStartupBytes>
+      <ServerName>LAB-Web1</ServerName>
+      <vhdpath>"K:\LAB-Web1\Virtual Hard Disks\LAB-Web1.vhdx"</vhdpath>
+      <generation>2</generation>
+      <bootdevice>VHD</bootdevice>
+      <switchname>"LAB_Switch"</switchname>
+      <path>"K:\"</path>
+      <processors>2</processors>
+      <dynamicmemory>$false</dynamicmemory>
+    </LAB-Web1>
+    <LAB-SQL1>
+      <MemoryStartupBytes>8192</MemoryStartupBytes>
+      <ServerName>LAB-SQL1</ServerName>
+      <vhdpath>"K:\LAB-SQL1\Virtual Hard Disks\LAB-SQL1.vhdx"</vhdpath>
+      <generation>2</generation>
+      <bootdevice>VHD</bootdevice>
+      <switchname>"LAB_Switch"</switchname>
+      <path>"K:\"</path>
+      <processors>2</processors>
+      <dynamicmemory>$false</dynamicmemory>
+    </LAB-SQL1>
+    <OWA>
+      <MemoryStartupBytes>8192</MemoryStartupBytes>
+      <ServerName>OWA</ServerName>
+      <vhdpath>"D:\VMs\OWA\Virtual Hard Disks\OWA.vhdx"</vhdpath>
+      <generation>2</generation>
+      <bootdevice>VHD</bootdevice>
+      <switchname>"LAB_Switch"</switchname>
+      <path>"D:\VMs\"</path>
+      <processors>2</processors>
+      <dynamicmemory>$true</dynamicmemory>
+    </OWA>
+  </VMs>
+</Servers>

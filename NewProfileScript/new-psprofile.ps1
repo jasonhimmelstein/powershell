@@ -1,5 +1,5 @@
 ﻿#  Script to create the PowerShell Profiles for every user 
-$version = "v3.4 02/5/2015"
+$version = "v3.8 02/6/2015"
 #  Jason Himmelstein
 #  http://www.sharepointlonghorn.com
 
@@ -86,10 +86,10 @@ New-Item -type file -path $psprofile -force
 # In an Office Web Apps remove the SharePoint PSSnapin and reference in the Write-Host
 Add-Content $psprofile {  
 #PowerShell Profiles to be used
-$version = "v4.2 02/05/2015"
+$version = "v4.12 02/07/2015"
 #Jason Himmelstein
 #http://www.sharepointlonghorn.com
- 
+  
 function get-cloudy
 {
 If($AZLoad -eq "y")
@@ -111,6 +111,21 @@ If($AZLoad -eq "y")
 # Get the VMs from the cloud service
 Write-host "These VMs are available in this Cloud Service:"
 Get-AzureVM | fl name,status
+}
+}
+
+function get-o365
+{
+try{
+    $SPOLoad = Read-Host "Do you wish to connect to Office 365? Type [y] to load" 
+    if ($SPOLoad -eq "y"){. .\set-o365connection.ps1}
+}
+catch
+{
+    Write-host "Failed to load set-o365Conection.ps1. Check the file location in your PowerShell Profile" -ForegroundColor Red
+
+    #to get verbose logging uncomment the following line
+    #write-host "$_" -BackgroundColor Black -ForegroundColor Red 
 }
 }
 
@@ -150,6 +165,10 @@ Import-Module 'C:\Program Files\SharePoint Online Management Shell\Microsoft.Onl
 ""
 Write-Host "The following PowerShell Modules are loaded:" -foregroundcolor DarkGreen -BackgroundColor Gray
 get-module | ft Name | out-default
+
+# Loading the CSOM references from add-CSOMreferencelibraries
+. .\add-CSOMreferencelibraries.ps1 -ea 0
+
 Write-Host "
 You are now entering PowerShell in the context of: $dName" -foregroundcolor darkgreen -backgroundcolor gray
 
@@ -157,6 +176,7 @@ $AZLoad = Read-Host "Do you wish to load your Azure Accounts? Type [y] to load"
 if ($AZLoad -eq "y"){$AZLoaded = add-AzureAccount}
 
 get-cloudy
+get-o365
 }
 
 
@@ -304,9 +324,9 @@ REM http://www.sharepointlonghorn.com
 powershell.exe -WindowStyle Hidden -file c:\PowerShellScripts\check-profiles.ps1}
 
 
-# Add the create-profile.ps1 shortcut to All Users Startup
-# Write-Host "Adding Check for PowerShell Profiles to All Users Startup..." -foregroundcolor white -backgroundcolor black
-$wshshell = New-Object -ComObject WScript.Shell
- $lnk = $wshshell.CreateShortcut("C:\Users\All Users\Start Menu\programs\StartUp\check-profiles.lnk")
- $lnk.TargetPath = "$scriptspath\$checkprofileshortcut"
- $lnk.Save()
+# Add the a shortcut link to favorites in Windows Explorer to the PowerShellScripts folder
+Write-Host "Adding a link to favorites in Windows Explorer to the PowerShellScripts folder..." -foregroundcolor white -backgroundcolor black
+$WshShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WshShell.CreateShortcut("C:\Users\Default\Links\PowerShellScripts.lnk")
+$Shortcut.TargetPath = $scriptspath
+$Shortcut.Save()

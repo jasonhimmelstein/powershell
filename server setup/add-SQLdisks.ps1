@@ -1,0 +1,3 @@
+﻿Get-Disk -Number 1 | Where partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle MBR -PassThru | New-Partition -DriveLetter D -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "SQLData" -Confirm:$false
+Get-Disk -Number 2 | Where partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle MBR -PassThru | New-Partition -DriveLetter L -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "SQLLogs" -Confirm:$false
+Get-Disk -Number 3 | Where partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle MBR -PassThru | New-Partition -DriveLetter T -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "SQLTemp" -Confirm:$false
