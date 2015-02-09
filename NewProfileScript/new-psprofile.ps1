@@ -1,8 +1,13 @@
 ﻿#  Script to create the PowerShell Profiles for every user 
-$version = "v3.8 02/6/2015"
+$filename = "new-psprofile.ps1"
+$version = "v4.0 updated on 02/09/2015"
 #  Jason Himmelstein
 #  http://www.sharepointlonghorn.com
 
+#Display the profile version
+Write-host "$filename $version"
+
+#region variables
 $scriptspath = "c:\PowerShellScripts"
 $logspath = "c:\PowerShellLogs"
 $checkforprofiles = "check-profiles.ps1"
@@ -10,14 +15,15 @@ $createprofile = "create-profiles.ps1"
 $profilescript = "create-powershellprofiles.bat"
 $createprofile = "create-profiles.ps1"
 $checkprofileshortcut = "check-profiles.bat"
+#endregion
 
-#Display the profile version
-Write-host "New PowerShell Profile Creation Script $version"
-
+#region registry
 # In order to be able to make programmatic changes to the registry you need to set the remote execution policy to allow this unless you unblock this script 
 Write-Host "Setting the Remote Execution policy to allow Registry changes" -foregroundcolor magenta -backgroundcolor black 
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+#endregion
 
+#region creating blank files & folders
 # This will create a logs and scripts directory off of the C:\ Root
 Write-Host "Creating the logs and scripts directories..." -foregroundcolor white -backgroundcolor black
 New-Item -Path $logspath -type directory -ErrorAction SilentlyContinue
@@ -38,8 +44,9 @@ New-item -type file -path $scriptspath\$profilescript -force
 # Create the batch file that will be launched via the shortcut in the All Users Startup 
 Write-Host "Creating batch file to run check-profiles..." -foregroundcolor white -backgroundcolor black
 New-item -type file -path $scriptspath\$checkprofileshortcut -force
+#endregion
 
-# Add content to check-profiles.ps1
+#region check-profiles.ps1
 Write-Host "Adding content to the check for profiles script file..." -foregroundcolor white -backgroundcolor black
 Add-Content $scriptspath\$checkforprofiles{# Script to check for PowerShell profiles and create them if they don't
 # v1.3 11/5/2012
@@ -65,33 +72,28 @@ If ($FileExists -eq $True){
 write-host "The profiles already exist" -ForegroundColor DarkGreen -BackgroundColor Gray}
 else{powershell.exe -file $createprofile -WindowStyle Hidden | Out-File c:\Users\$env:Username\Documents\profilecreation.log}
 }
+#endregion
 
+#region Microsoft.PowerShell_profile.ps1
 # Add content to create-profiles.ps1 
 Write-Host "Adding content to the creating profiles script file..." -foregroundcolor white -backgroundcolor black
-Add-Content $scriptspath\$createprofile {# Script to create PowerShell profiles for SharePoint environments
-#  v0.7 11/3/2012
-#  Jason Himmelstein
-#  http://www.sharepointlonghorn.com
-
-$psprofile = "C:\Users\$env:Username\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
-$psiseprofile = "C:\Users\$env:Username\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"
-
-#create empty .ps1 files
-New-item -type file -path $psiseprofile -force
-New-Item -type file -path $psprofile -force
-
-# This script will set the default location in PowerShell to c:\powershellscripts
-# It will also automatically load the SharePoint Snapin 
-# It will let you know what user you are running in the context of
-# In an Office Web Apps remove the SharePoint PSSnapin and reference in the Write-Host
-Add-Content $psprofile {  
+Add-Content $scriptspath\$createprofile {
 #PowerShell Profiles to be used
-$version = "v4.12 02/07/2015"
+$filename = "Microsoft.PowerShell_profile.ps1"
+$version = "v4.22 updated on 02/08/2015"
 #Jason Himmelstein
 #http://www.sharepointlonghorn.com
-  
+
+#Display the profile version
+Write-host "$filename $version" -BackgroundColor Black -ForegroundColor Yellow
+""
+
+#region functions  
 function get-cloudy
 {
+$AZLoad = Read-Host "Do you wish to load your Azure Accounts? Type [y] to load" 
+if ($AZLoad -eq "y"){$AZLoaded = add-AzureAccount}
+
 If($AZLoad -eq "y")
 {
 $xml = (Get-Content -raw -path "C:\Users\$env:username\AppData\Roaming\Windows Azure Powershell\AzureProfile.json") | ConvertFrom-Json
@@ -117,8 +119,8 @@ Get-AzureVM | fl name,status
 function get-o365
 {
 try{
-    $SPOLoad = Read-Host "Do you wish to connect to Office 365? Type [y] to load" 
-    if ($SPOLoad -eq "y"){. .\set-o365connection.ps1}
+    $o365Load = Read-Host "Do you wish to connect to Office 365? Type [y] to load" 
+    if ($o365Load -eq "y"){. .\set-o365connection.ps1}
 }
 catch
 {
@@ -129,16 +131,27 @@ catch
 }
 }
 
-#Display the profile version
-Write-host "PowerShell Profile $version"
+function get-SPO
+{
+try{
+    $SPOLoad = Read-Host "Do you wish to connect to SharePoint Online? Type [y] to load" 
+    if ($SPOLoad -eq "y"){. .\set-SPOconnection.ps1}
+}
+catch
+{
+    Write-host "Failed to load set-SPOConection.ps1. Check the file location in your PowerShell Profile" -ForegroundColor Red
+
+    #to get verbose logging uncomment the following line
+    #write-host "$_" -BackgroundColor Black -ForegroundColor Red 
+}
+}
+
+#endregion
 
 # Setting the default starting path
 Set-Location c:\powershellscripts\
-#PowerShell Profile for PSSnapin
-# Welcome message
-$Name = $env:Username
-$dName = $env:USERDOMAIN + '\' + $env:Username
 
+#region permissions check
 if ( -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
 { 
     Write-Host "This PowerShell prompt is not elevated" -ForegroundColor Red -BackgroundColor black
@@ -146,18 +159,28 @@ if ( -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIden
 Please restart PowerShell as with the administrator token set." -ForegroundColor Yellow -BackgroundColor black
     return
 }
+#endregion
+
+#region logging
+# set logging
 $path = "C:\PowerShellLogs"
-$logname = "{0}\{1}-{2}.{3}" -f $path,$name, `
+$logname = "{0}\{1}-{2}.{3}" -f $path,$env:Username, `
     (Get-Date -Format MMddyyyy-HHmmss),"Txt"
 # Start Transcript in logs directory
 start-transcript (New-Item -Path $logname -ItemType file) -append -noclobber
  $a = Get-Date
 “Date: ” + $a.ToShortDateString()
 “Time: ” + $a.ToShortTimeString() 
+#endregion 
+
+#region imports
+#loading snap-ins & modules
+""
 Write-Host "Please wait while the PowerShell snap-ins load" -foregroundcolor black -backgroundcolor gray
 Add-PSSnapin Microsoft.SharePoint.PowerShell -ea 0
 Add-PSSnapin Microsoft.Windows.AD -ea 0
 Import-Module ActiveDirectory -ErrorAction SilentlyContinue
+""
 Write-Host "The following PowerShell Snap-ins are loaded:" -foregroundcolor darkgreen -backgroundcolor gray
 get-pssnapin
 Import-Module 'C:\Program Files (x86)\Microsoft SDKs\Azure\PowerShell\ServiceManagement\Azure\Azure.psd1' -ErrorAction SilentlyContinue
@@ -165,21 +188,33 @@ Import-Module 'C:\Program Files\SharePoint Online Management Shell\Microsoft.Onl
 ""
 Write-Host "The following PowerShell Modules are loaded:" -foregroundcolor DarkGreen -BackgroundColor Gray
 get-module | ft Name | out-default
+#endregion
 
+#region CSOM
 # Loading the CSOM references from add-CSOMreferencelibraries
-. .\add-CSOMreferencelibraries.ps1 -ea 0
+try{
+    ""
+    Write-Host "Attempting to load CSOM Reference Libraries"
+    . .\add-CSOMreferencelibraries.ps1 -ea 0
+    ""
+}
+catch{
+    Write-host "Failed to load add-CSOMreferencelibraries.ps1. Check the file location in your PowerShell Profile" -ForegroundColor Red
+    Write-Host "Error: $_" -BackgroundColor Black -ForegroundColor Red 
+    ""
+}
+#endregion
 
-Write-Host "
-You are now entering PowerShell in the context of: $dName" -foregroundcolor darkgreen -backgroundcolor gray
+Write-Host "You are now entering PowerShell in the context of: $env:USERDOMAIN\$env:Username" -foregroundcolor darkgreen -backgroundcolor gray
 
-$AZLoad = Read-Host "Do you wish to load your Azure Accounts? Type [y] to load" 
-if ($AZLoad -eq "y"){$AZLoaded = add-AzureAccount}
-
+# load additional modules with authentication 
 get-cloudy
 get-o365
+get-SPO
 }
+#endregion
 
-
+#region Microsoft.PowerShellISE_profile.ps1
 # In an Office Web Apps remove the SharePoint PSSnapin and reference in the Write-Host
 Add-Content $psiseprofile {
 # PowerShell_ISE profile for SharePoint environments
@@ -300,8 +335,9 @@ You are now entering PowerShell in the context of: $dName" -foregroundcolor dark
 
 get-cloudy
 }
-}
+#endregion
 
+#region create-powershellprofiles.bat
 # Add content to create-powershellprofiles.bat
 Write-Host "Adding content to the create PowerShell Profiles batch file..." -foregroundcolor white -backgroundcolor black
 Add-Content $scriptspath\$profilescript {REM Batch file to create PowerShell Profiles 
@@ -312,9 +348,10 @@ REM http://www.sharepointlonghorn.com
 powershell.exe -command "Set-ExecutionPolicy Bypass -Scope CurrentUser -Force"
 powershell.exe -file "c:\PowerShellScripts\create-profiles.ps1"
 }
+#endregion
 
-
-# Add content to check-profiles.ps1
+#region check-profiles.bat
+# Add content to check-profiles.bat
 Write-Host "Adding content to the batch file to launch the check for profiles script file..." -foregroundcolor white -backgroundcolor black
 Add-Content $scriptspath\$checkprofileshortcut {REM Batch file to launch the check for profiles script file
 REM v1.4 01/26/2013
@@ -322,11 +359,13 @@ REM Jason Himmelstein
 REM http://www.sharepointlonghorn.com
 
 powershell.exe -WindowStyle Hidden -file c:\PowerShellScripts\check-profiles.ps1}
+#endregion
 
-
+#region add a shortcut link to favorites
 # Add the a shortcut link to favorites in Windows Explorer to the PowerShellScripts folder
 Write-Host "Adding a link to favorites in Windows Explorer to the PowerShellScripts folder..." -foregroundcolor white -backgroundcolor black
 $WshShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WshShell.CreateShortcut("C:\Users\Default\Links\PowerShellScripts.lnk")
 $Shortcut.TargetPath = $scriptspath
 $Shortcut.Save()
+#endregion

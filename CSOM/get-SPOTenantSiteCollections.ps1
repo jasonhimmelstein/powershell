@@ -1,11 +1,11 @@
 ﻿# Script to get all site collections of a SharePoint Online tenant
 $filename = "get-SPOTenantSiteCollections.ps1"
-$version = "v1.19 updated on 02/07/2015"
+$version = "v1.19 updated on 02/08/2015"
 # Jason Himmelstein
 # http://www.sharepointlonghorn.com
 
 # Display the profile version
-Write-host "$filename $version"
+Write-host "$filename $version" -BackgroundColor Black -ForegroundColor Yellow
 
 # Pre-loaded scripts for authentication to the Admin Tenant
 . .\SPO-tenantadminpreload.ps1
