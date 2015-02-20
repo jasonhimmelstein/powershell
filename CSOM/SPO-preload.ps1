@@ -1,6 +1,6 @@
 ﻿# Script to get SharePoint Online tenant authentication information
 $filename = "SPO-preloads.ps1"
-$version = "v1.19 updated on 02/08/2015"
+$version = "v1.20 updated on 02/19/2015"
 # Jason Himmelstein
 # http://www.sharepointlonghorn.com
 
