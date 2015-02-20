@@ -45,7 +45,3 @@ if (!$clientContext.ServerObjectIsNull.Value)
 { 
     Write-Host "Connected to SharePoint Online site: '$Url'" -ForegroundColor Green 
 } 
-
-[uri] $foo = "https://splh.sharepoint.com/sites/snark/"
-$surl = $foo.DnsSafeHost.Replace(".sharepoint.com","-admin.sharepoint.com")
-$furl = "https://"+$surl
