@@ -11,9 +11,9 @@ Write-host "$filename $version" -BackgroundColor Black -ForegroundColor Yellow
 function get-SPOTenantAdminURL
 {
 # strips down and creates the SPO Tenant Admin URL
-$aurl = $url.Replace(".sharepoint.com","-admin.sharepoint.com") 
-$burl = $aurl -replace("com/.*")
-$spoaurl = $burl.Replace("sharepoint.","sharepoint.com")
+$aurl = [uri] $url
+$burl =  $aurl.DnsSafeHost.Replace(".sharepoint.com","-admin.sharepoint.com")
+$spoaurl = "https://"+$burl
 $spoaurl
 }
 
@@ -40,7 +40,7 @@ $turl = "https://splh.sharepoint.com/"
 
 #region build variables
 # build variable strings
-$url = Read-Host -Prompt "What SPO tenant do you want to connect to. If ""$turl"" please press enter otherwise type correct URL"  
+$url = Read-Host -Prompt "What o365 tenant do you want to connect to. If ""$turl"" please press enter otherwise type correct URL"  
 if ($url -eq "") {$url = $turl}
 $username = Read-Host -Prompt "What is the tenant admin account for $url. If ""$tusername"" please press enter otherwise type correct account"  
 if ($username -eq "") {$username = $tusername}
