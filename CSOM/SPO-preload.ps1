@@ -11,9 +11,9 @@ Write-host "$filename $version" -BackgroundColor Black -ForegroundColor Yellow
 function get-SPOTenantAdminURL
 {
 # strips down and creates the SPO Tenant Admin URL
-$aurl = $url.Replace(".sharepoint.com","-admin.sharepoint.com") 
-$turl = $aurl -replace("com/.*")
-$spoaurl = $burl.Replace("sharepoint.","sharepoint.com")
+$aurl = [uri] $url
+$burl =  $aurl.DnsSafeHost.Replace(".sharepoint.com","-admin.sharepoint.com")
+$spoaurl = "https://"+$burl
 $spoaurl
 }
 #endregion
@@ -21,7 +21,7 @@ $spoaurl
 #region temp variables
 #variables
 $tusername = "jase@sharepointlonghorn.com" 
-$turl = "https://splh.sharepoint.com/"
+$turl = "https://splh.sharepoint.com/sites/foo"
 #endregion
 
 #region build variables
@@ -46,3 +46,6 @@ if (!$clientContext.ServerObjectIsNull.Value)
     Write-Host "Connected to SharePoint Online site: '$Url'" -ForegroundColor Green 
 } 
 
+[uri] $foo = "https://splh.sharepoint.com/sites/snark/"
+$surl = $foo.DnsSafeHost.Replace(".sharepoint.com","-admin.sharepoint.com")
+$furl = "https://"+$surl
