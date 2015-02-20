@@ -1,6 +1,6 @@
 ﻿# Script to get SharePoint Online tenant authentication information
 $filename = "get-SPOListWebsandUpdateVersioning.ps1"
-$version = "v1.04 updated on 02/07/2015"
+$version = "v1.04 updated on 02/07/2015 foo"
 # Jason Himmelstein
 # http://www.sharepointlonghorn.com
 # credit to Chris O'Brien, MVP for the core of this script

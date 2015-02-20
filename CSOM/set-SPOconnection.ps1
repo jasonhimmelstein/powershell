@@ -1,6 +1,6 @@
 ﻿# Connect to SharePoint Online 
 $filename = "set-SPOconnection.ps1"
-$version = "v1.22 updated on 02/08/2015"
+$version = "v1.23 updated on 02/20/2015 foo"
 # Jason Himmelstein
 # http://www.sharepointlonghorn.com
 
@@ -41,13 +41,17 @@ if ($username -eq "") {$username = $tusername}
 #region security
 $securePassword = Read-Host -Prompt "Enter your password: " -AsSecureString   
 $credential = New-Object System.Management.Automation.PsCredential($username, $securePassword)
+
+# connect/authenticate to SharePoint Online and get ClientContext object.. 
+$clientContext = New-Object Microsoft.SharePoint.Client.ClientContext($url)  
+$clientContext.Credentials = $credential 
 #endregion
 
 #region tenant admin url
 # Build the tenant admin URL
-$aurl = $url.Replace(".sharepoint.com","-admin.sharepoint.com") 
-$burl = $aurl -replace("com/.*")
-$spoaurl = $burl.Replace("sharepoint.","sharepoint.com")
+$aurl = [uri] $url
+$burl =  $aurl.DnsSafeHost.Replace(".sharepoint.com","-admin.sharepoint.com")
+$spoaurl = "https://"+$burl
 #endregion 
 
 connect-spo

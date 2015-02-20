@@ -1,27 +1,16 @@
 ﻿# Script to get SharePoint Online tenant authentication information
 $filename = "SPO-preloads.ps1"
-$version = "v1.20 updated on 02/19/2015"
+$version = "v1.22 updated on 02/20/2015"
 # Jason Himmelstein
 # http://www.sharepointlonghorn.com
 
 # Display the profile version
 Write-host "$filename $version" -BackgroundColor Black -ForegroundColor Yellow
 
-#region functions
-function get-SPOTenantAdminURL
-{
-# strips down and creates the SPO Tenant Admin URL
-$aurl = [uri] $url
-$burl =  $aurl.DnsSafeHost.Replace(".sharepoint.com","-admin.sharepoint.com")
-$spoaurl = "https://"+$burl
-$spoaurl
-}
-#endregion
-
 #region temp variables
 #variables
 $tusername = "jase@sharepointlonghorn.com" 
-$turl = "https://splh.sharepoint.com/sites/foo"
+$turl = "https://splh.sharepoint.com/sites/atrion"
 #endregion
 
 #region build variables
