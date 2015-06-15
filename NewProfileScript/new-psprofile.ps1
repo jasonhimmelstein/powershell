@@ -1,6 +1,6 @@
 #  Script to create the PowerShell Profiles for every user 
 $filename = "new-psprofile.ps1"
-$version = "v4.03 updated on 06/10/2015"
+$version = "v4.05 updated on 06/15/2015"
 #  Jason Himmelstein
 #  http://www.sharepointlonghorn.com
 
@@ -15,8 +15,8 @@ $createprofile = "create-profiles.ps1"
 $profilescript = "create-powershellprofiles.bat"
 $createprofile = "create-profiles.ps1"
 $checkprofileshortcut = "check-profiles.bat"
-$psprofile = "C:\Users\$env:Username\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
-$psiseprofile = "C:\Users\$env:Username\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"
+$psprofile = "$env:UserProfile\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+$psiseprofile = "$env:UserProfile\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"
 #endregion
 
 #region registry
@@ -51,7 +51,7 @@ New-item -type file -path $scriptspath\$checkprofileshortcut -force
 #region check-profiles.ps1
 Write-Host "Adding content to the check for profiles script file..." -foregroundcolor white -backgroundcolor black
 Add-Content $scriptspath\$checkforprofiles{# Script to check for PowerShell profiles and create them if they don't
-# v1.3 11/5/2012
+# v1.4 06/15/2015
 # Jason Himmelstein
 # http://www.sharepointlonghorn.com
 
@@ -66,13 +66,13 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 # Variable defines where the create profiles script is 
 $createprofile = "c:\PowerShellScripts\create-profiles.ps1"
 # Variable that calls to where the default powershell profile location is 
-$userprofilecreated = "C:\Users\$env:Username\Documents\WindowsPowerShell\"
+$userprofilecreated = "$env:UserProfile\Documents\WindowsPowerShell\"
 
 $ChkFile = $userprofilecreated 
 $FileExists = Test-Path $ChkFile 
 If ($FileExists -eq $True){
 write-host "The profiles already exist" -ForegroundColor DarkGreen -BackgroundColor Gray}
-else{powershell.exe -file $createprofile -WindowStyle Hidden | Out-File c:\Users\$env:Username\Documents\profilecreation.log}
+else{powershell.exe -file $createprofile -WindowStyle Hidden | Out-File $env:UserProfile\Documents\profilecreation.log}
 }
 #endregion
 
@@ -82,15 +82,15 @@ Write-Host "Adding content to the creating profiles script file..." -foregroundc
 Add-Content $scriptspath\$createprofile {
 #PowerShell Profiles to be used
 $filename = "Microsoft.PowerShell_profile.ps1"
-$version = "v4.22 updated on 02/08/2015"
+$version = "v4.23 updated on 06/15/2015"
 #Jason Himmelstein
 #http://www.sharepointlonghorn.com
 
 #Display the profile version
 Write-host "$filename $version" -BackgroundColor Black -ForegroundColor Yellow
 ""
-$psprofile = "C:\Users\$env:Username\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
-$psiseprofile = "C:\Users\$env:Username\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"
+$psprofile = "$env:UserProfile\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+$psiseprofile = "$env:UserProfile\Documents\WindowsPowerShell\Microsoft.PowerShellISE_profile.ps1"
 
 #create empty .ps1 files
 New-item -type file -path $psiseprofile -force
@@ -105,7 +105,7 @@ New-Item -type file -path $psprofile -force
 Add-Content $psprofile { 
         #PowerShell Profiles to be used
         $filename = "Microsoft.PowerShell_profile.ps1"
-        $version = "v4.22 updated on 02/08/2015"
+        $version = "v4.23 updated on 06/15/2015"
         #Jason Himmelstein
         #http://www.sharepointlonghorn.com
 
@@ -121,7 +121,7 @@ Add-Content $psprofile {
 
         If($AZLoad -eq "y")
         {
-        $xml = (Get-Content -raw -path "C:\Users\$env:username\AppData\Roaming\Windows Azure Powershell\AzureProfile.json") | ConvertFrom-Json
+        $xml = (Get-Content -raw -path "$env:UserProfile\AppData\Roaming\Windows Azure Powershell\AzureProfile.json") | ConvertFrom-Json
         $xsub = $xml.Subscriptions | Select-Object name | out-gridview -outputmode Single -title "Azure Subscriptions"
         Select-AzureSubscription -SubscriptionName $xsub.name
         }
